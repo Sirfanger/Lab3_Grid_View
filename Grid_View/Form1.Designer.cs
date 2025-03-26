@@ -37,6 +37,7 @@
             Nazwisko = new DataGridViewTextBoxColumn();
             Wiek = new DataGridViewTextBoxColumn();
             Stanowisko = new DataGridViewTextBoxColumn();
+            textBox1 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -68,6 +69,7 @@
             odczyt.TabIndex = 2;
             odczyt.Text = "odczyt z .csv";
             odczyt.UseVisualStyleBackColor = true;
+            odczyt.Click += odczyt_Click;
             // 
             // zapis
             // 
@@ -77,6 +79,7 @@
             zapis.TabIndex = 3;
             zapis.Text = "Zapis do .csv";
             zapis.UseVisualStyleBackColor = true;
+            zapis.Click += zapis_Click;
             // 
             // dataGridView1
             // 
@@ -109,11 +112,20 @@
             Stanowisko.HeaderText = "Stanowisko";
             Stanowisko.Name = "Stanowisko";
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(462, 301);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(128, 23);
+            textBox1.TabIndex = 5;
+            textBox1.TextChanged += textBox1_TextChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(textBox1);
             Controls.Add(dataGridView1);
             Controls.Add(zapis);
             Controls.Add(odczyt);
@@ -123,6 +135,7 @@
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -136,5 +149,6 @@
         private DataGridViewTextBoxColumn Nazwisko;
         private DataGridViewTextBoxColumn Wiek;
         private DataGridViewTextBoxColumn Stanowisko;
+        private TextBox textBox1;
     }
 }
