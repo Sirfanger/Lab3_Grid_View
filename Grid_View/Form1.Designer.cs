@@ -38,6 +38,9 @@
             Wiek = new DataGridViewTextBoxColumn();
             Stanowisko = new DataGridViewTextBoxColumn();
             textBox1 = new TextBox();
+            button1 = new Button();
+            button2 = new Button();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -120,11 +123,44 @@
             textBox1.TabIndex = 5;
             textBox1.TextChanged += textBox1_TextChanged;
             // 
+            // button1
+            // 
+            button1.Location = new Point(111, 343);
+            button1.Name = "button1";
+            button1.Size = new Size(112, 55);
+            button1.TabIndex = 6;
+            button1.Text = "Zapis do XML";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(289, 343);
+            button2.Name = "button2";
+            button2.Size = new Size(111, 55);
+            button2.TabIndex = 7;
+            button2.Text = "odczyt XML";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(588, 230);
+            button3.Name = "button3";
+            button3.Size = new Size(107, 65);
+            button3.TabIndex = 8;
+            button3.Text = "Test";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(dataGridView1);
             Controls.Add(zapis);
@@ -150,5 +186,8 @@
         private DataGridViewTextBoxColumn Wiek;
         private DataGridViewTextBoxColumn Stanowisko;
         private TextBox textBox1;
+        private Button button1;
+        private Button button2;
+        private Button button3;
     }
 }

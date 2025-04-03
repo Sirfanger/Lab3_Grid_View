@@ -1,7 +1,14 @@
 using System.Data;
+using System;
+using System.IO;
+using System.Xml.Serialization;
+using System.Windows.Forms;
+
 
 namespace Grid_View
 {
+
+
     public partial class Form1 : Form
     {
         public Form1()
@@ -30,7 +37,7 @@ namespace Grid_View
         }
         private void LoadCSVToDataGridView(string filePath)
         {
-            // SprawdŸ, czy plik istnieje
+
             if (!File.Exists(filePath))
             {
                 MessageBox.Show("Plik CSV nie istnieje.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -89,5 +96,73 @@ namespace Grid_View
         {
             ExportToCSV(dataGridView1, textBox1.Text);
         }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            SerializeToXML("person.xml");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+        // Metoda do serializacji do XML
+        public void SerializeToXML(string fileName)
+        {
+            foreach (DataGridViewRow row in dataGridView.Rows)
+            {
+                // Pomijaj wiersze niemieszcz¹ce siê w DataGridView (np. wiersz zaznaczania)
+                if (!row.IsNewRow)
+                {
+                    // Dodaj kolejne wartoœci w wierszu, oddzielone przecinkami
+                    csvContent += string.Join(",", Array.ConvertAll(row.Cells.Cast<DataGridViewCell>()
+                    .ToArray(), c => c.Value)) + Environment.NewLine;
+                }
+            }
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
+            using (TextWriter writer = new StreamWriter(fileName))
+            {
+                serializer.Serialize(writer, this);
+            }
+            Console.WriteLine("Obiekt zosta³ zserializowany do pliku XML.");
+        }
+        // Metoda do deserializacji z XML
+        public static Person DeserializeFromXML(string fileName)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
+            using (TextReader reader = new StreamReader(fileName))
+            {
+                Person person = (Person)serializer.Deserialize(reader);
+                Console.WriteLine("Obiekt zosta³ odczytany z pliku XML.");
+                return person;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DeserializeFromXML("person.xml");
+        }
     }
+    [Serializable]
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public Person() { } // Domyœlny konstruktor wymagany do serializacji
+        // Konstruktor
+        public Person(string firstName, string lastName, int age)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Age = age;
+        }
+      
+        
+    }
+
+    
 }
+
+
+
