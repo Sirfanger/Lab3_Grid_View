@@ -38,6 +38,8 @@
             Wiek = new DataGridViewTextBoxColumn();
             Stanowisko = new DataGridViewTextBoxColumn();
             textBox1 = new TextBox();
+            button1 = new Button();
+            button2 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -120,11 +122,33 @@
             textBox1.TabIndex = 5;
             textBox1.TextChanged += textBox1_TextChanged;
             // 
+            // button1
+            // 
+            button1.Location = new Point(111, 343);
+            button1.Name = "button1";
+            button1.Size = new Size(112, 49);
+            button1.TabIndex = 6;
+            button1.Text = "Zapis do JSON";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(289, 343);
+            button2.Name = "button2";
+            button2.Size = new Size(115, 49);
+            button2.TabIndex = 7;
+            button2.Text = "odczyt z JSON";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(textBox1);
             Controls.Add(dataGridView1);
             Controls.Add(zapis);
@@ -150,5 +174,7 @@
         private DataGridViewTextBoxColumn Wiek;
         private DataGridViewTextBoxColumn Stanowisko;
         private TextBox textBox1;
+        private Button button1;
+        private Button button2;
     }
 }
