@@ -37,48 +37,71 @@ namespace Grid_View
         }
         private void LoadCSVToDataGridView(string filePath)
         {
-
             if (!File.Exists(filePath))
             {
                 MessageBox.Show("Plik CSV nie istnieje.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            // Odczytaj zawartoœæ pliku CSV
-            string[] lines = File.ReadAllLines(filePath);
-            // Tworzenie tabeli danych
-            DataTable dataTable = new DataTable();
-            // Dodanie kolumn na podstawie nag³ówka
-            string[] headers = lines[0].Split(',');
-            foreach (string header in headers)
+
+            try
             {
-                dataTable.Columns.Add(header);
+                string[] lines = File.ReadAllLines(filePath);
+
+                if (lines.Length == 0)
+                {
+                    MessageBox.Show("Plik CSV jest pusty.");
+                    return;
+                }
+
+                dataGridView1.Columns.Clear();
+                dataGridView1.Rows.Clear();
+
+                // Nag³ówki
+                string[] headers = lines[0].Split(',');
+                foreach (string header in headers)
+                {
+                    dataGridView1.Columns.Add(header.Trim(), header.Trim());
+                }
+
+                // Wiersze
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(lines[i])) continue;
+
+                    string[] values = lines[i].Split(',');
+                    if (values.Length != headers.Length)
+                    {
+                        MessageBox.Show($"Niezgodnoœæ liczby kolumn w linii {i + 1}. Pominiêto.");
+                        continue;
+                    }
+
+                    dataGridView1.Rows.Add(values);
+                }
             }
-            // Dodawanie wierszy do tabeli danych
-            for (int i = 1; i < lines.Length; i++)
+            catch (Exception ex)
             {
-                string[] values = lines[i].Split(',');
-                dataTable.Rows.Add(values);
+                MessageBox.Show("B³¹d podczas wczytywania CSV: " + ex.Message);
             }
-            // Przypisanie tabeli danych do DataGridView
-            dataGridView1.DataSource = dataTable;
         }
         private void ExportToCSV(DataGridView dataGridView, string filePath)
         {
-            // Tworzenie nag³ówka pliku CSV
-            string csvContent = "Column1,Column2,Column3" + Environment.NewLine;
-            // Dodawanie danych z DataGridView
-            foreach (DataGridViewRow row in dataGridView.Rows)
+            using (StreamWriter writer = new StreamWriter(filePath))
             {
-                // Pomijaj wiersze niemieszcz¹ce siê w DataGridView (np. wiersz zaznaczania)
-                if (!row.IsNewRow)
+                // Nag³ówki
+                var headers = dataGridView.Columns.Cast<DataGridViewColumn>();
+                writer.WriteLine(string.Join(",", headers.Select(col => col.HeaderText)));
+
+                // Dane
+                foreach (DataGridViewRow row in dataGridView.Rows)
                 {
-                    // Dodaj kolejne wartoœci w wierszu, oddzielone przecinkami
-                    csvContent += string.Join(",", Array.ConvertAll(row.Cells.Cast<DataGridViewCell>()
-                    .ToArray(), c => c.Value)) + Environment.NewLine;
+                    if (!row.IsNewRow)
+                    {
+                        var values = row.Cells.Cast<DataGridViewCell>()
+                                              .Select(cell => cell.Value?.ToString()?.Replace(",", " ") ?? "");
+                        writer.WriteLine(string.Join(",", values));
+                    }
                 }
             }
-            // Zapisanie zawartoœci do pliku CSV
-            File.WriteAllText(filePath, csvContent);
         }
 
         private void odczyt_Click(object sender, EventArgs e)
@@ -109,32 +132,64 @@ namespace Grid_View
         // Metoda do serializacji do XML
         public void SerializeToXML(string fileName)
         {
-            foreach (DataGridViewRow row in dataGridView.Rows)
+            List<Person> people = new List<Person>();
+
+            foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                // Pomijaj wiersze niemieszcz¹ce siê w DataGridView (np. wiersz zaznaczania)
                 if (!row.IsNewRow)
                 {
-                    // Dodaj kolejne wartoœci w wierszu, oddzielone przecinkami
-                    csvContent += string.Join(",", Array.ConvertAll(row.Cells.Cast<DataGridViewCell>()
-                    .ToArray(), c => c.Value)) + Environment.NewLine;
+                    try
+                    {
+                        string firstName = row.Cells[0].Value?.ToString();
+                        string lastName = row.Cells[1].Value?.ToString();
+                        int age = int.Parse(row.Cells[2].Value?.ToString() ?? "0");
+                        string stanowisko = row.Cells[3].Value?.ToString();
+
+
+                        people.Add(new Person(firstName, lastName, age, stanowisko));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("B³¹d podczas serializacji: " + ex.Message);
+                    }
                 }
             }
+
             XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
             using (TextWriter writer = new StreamWriter(fileName))
             {
-                serializer.Serialize(writer, this);
+                serializer.Serialize(writer, people);
             }
-            Console.WriteLine("Obiekt zosta³ zserializowany do pliku XML.");
+
+            MessageBox.Show("Dane zapisane do XML.");
         }
-        // Metoda do deserializacji z XML
-        public static Person DeserializeFromXML(string fileName)
+        public void DeserializeFromXML(string fileName)
         {
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show("Plik XML nie istnieje.");
+                return;
+            }
+
             XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
             using (TextReader reader = new StreamReader(fileName))
             {
-                Person person = (Person)serializer.Deserialize(reader);
-                Console.WriteLine("Obiekt zosta³ odczytany z pliku XML.");
-                return person;
+                try
+                {
+                    List<Person> people = (List<Person>)serializer.Deserialize(reader);
+                    dataGridView1.Rows.Clear();
+
+                    foreach (Person p in people)
+                    {
+                        dataGridView1.Rows.Add(p.FirstName, p.LastName, p.Age, p.Stanowisko);
+                    }
+
+                    MessageBox.Show("Dane wczytane z XML.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("B³¹d deserializacji: " + ex.Message);
+                }
             }
         }
 
@@ -149,19 +204,22 @@ namespace Grid_View
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
+
+        public string Stanowisko { get; set; }  
         public Person() { } // Domyœlny konstruktor wymagany do serializacji
         // Konstruktor
-        public Person(string firstName, string lastName, int age)
+        public Person(string firstName, string lastName, int age, string stanowisko)
         {
             FirstName = firstName;
             LastName = lastName;
             Age = age;
+            Stanowisko = stanowisko;
         }
-      
-        
+
+
     }
 
-    
+
 }
 
 

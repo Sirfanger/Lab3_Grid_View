@@ -46,7 +46,7 @@
             // 
             // dodaj
             // 
-            dodaj.Location = new Point(588, 67);
+            dodaj.Location = new Point(638, 64);
             dodaj.Name = "dodaj";
             dodaj.Size = new Size(75, 45);
             dodaj.TabIndex = 0;
@@ -56,7 +56,7 @@
             // 
             // usun
             // 
-            usun.Location = new Point(588, 130);
+            usun.Location = new Point(638, 115);
             usun.Name = "usun";
             usun.Size = new Size(75, 47);
             usun.TabIndex = 1;
@@ -117,7 +117,7 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(462, 301);
+            textBox1.Location = new Point(462, 272);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(128, 23);
             textBox1.TabIndex = 5;
@@ -145,7 +145,7 @@
             // 
             // button3
             // 
-            button3.Location = new Point(588, 230);
+            button3.Location = new Point(622, 250);
             button3.Name = "button3";
             button3.Size = new Size(107, 65);
             button3.TabIndex = 8;
