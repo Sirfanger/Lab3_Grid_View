@@ -29,49 +29,72 @@ namespace Grid_View
             dataGridView1.Rows.RemoveAt(rowind);
         }
         private void LoadCSVToDataGridView(string filePath)
+{
+    if (!File.Exists(filePath))
+    {
+        MessageBox.Show("Plik CSV nie istnieje.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+    }
+
+    try
+    {
+        string[] lines = File.ReadAllLines(filePath);
+
+        if (lines.Length == 0)
         {
-            // SprawdŸ, czy plik istnieje
-            if (!File.Exists(filePath))
-            {
-                MessageBox.Show("Plik CSV nie istnieje.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            // Odczytaj zawartoœæ pliku CSV
-            string[] lines = File.ReadAllLines(filePath);
-            // Tworzenie tabeli danych
-            DataTable dataTable = new DataTable();
-            // Dodanie kolumn na podstawie nag³ówka
-            string[] headers = lines[0].Split(',');
-            foreach (string header in headers)
-            {
-                dataTable.Columns.Add(header);
-            }
-            // Dodawanie wierszy do tabeli danych
-            for (int i = 1; i < lines.Length; i++)
-            {
-                string[] values = lines[i].Split(',');
-                dataTable.Rows.Add(values);
-            }
-            // Przypisanie tabeli danych do DataGridView
-            dataGridView1.DataSource = dataTable;
+            MessageBox.Show("Plik CSV jest pusty.");
+            return;
         }
+
+        dataGridView1.Columns.Clear();
+        dataGridView1.Rows.Clear();
+
+        // Nag³ówki
+        string[] headers = lines[0].Split(',');
+        foreach (string header in headers)
+        {
+            dataGridView1.Columns.Add(header.Trim(), header.Trim());
+        }
+
+        // Wiersze
+        for (int i = 1; i < lines.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i])) continue;
+
+            string[] values = lines[i].Split(',');
+            if (values.Length != headers.Length)
+            {
+                MessageBox.Show($"Niezgodnoœæ liczby kolumn w linii {i + 1}. Pominiêto.");
+                continue;
+            }
+
+            dataGridView1.Rows.Add(values);
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("B³¹d podczas wczytywania CSV: " + ex.Message);
+    }
+}
         private void ExportToCSV(DataGridView dataGridView, string filePath)
         {
-            // Tworzenie nag³ówka pliku CSV
-            string csvContent = "Column1,Column2,Column3" + Environment.NewLine;
-            // Dodawanie danych z DataGridView
-            foreach (DataGridViewRow row in dataGridView.Rows)
+            using (StreamWriter writer = new StreamWriter(filePath))
             {
-                // Pomijaj wiersze niemieszcz¹ce siê w DataGridView (np. wiersz zaznaczania)
-                if (!row.IsNewRow)
+                // Nag³ówki
+                var headers = dataGridView.Columns.Cast<DataGridViewColumn>();
+                writer.WriteLine(string.Join(",", headers.Select(col => col.HeaderText)));
+
+                // Dane
+                foreach (DataGridViewRow row in dataGridView.Rows)
                 {
-                    // Dodaj kolejne wartoœci w wierszu, oddzielone przecinkami
-                    csvContent += string.Join(",", Array.ConvertAll(row.Cells.Cast<DataGridViewCell>()
-                    .ToArray(), c => c.Value)) + Environment.NewLine;
+                    if (!row.IsNewRow)
+                    {
+                        var values = row.Cells.Cast<DataGridViewCell>()
+                                              .Select(cell => cell.Value?.ToString()?.Replace(",", " ") ?? "");
+                        writer.WriteLine(string.Join(",", values));
+                    }
                 }
             }
-            // Zapisanie zawartoœci do pliku CSV
-            File.WriteAllText(filePath, csvContent);
         }
 
         private void odczyt_Click(object sender, EventArgs e)
